@@ -476,7 +476,7 @@ namespace Celesta
             switch (warning)
             {
                 case ImConverseNotice.Info:
-                    color = new Vector4(0, 0.5f, 1, 1);
+                    color = ColorResource.Celeste;
                     icon = FontAwesome6.CircleInfo;
                     break;
                 case ImConverseNotice.Warning:

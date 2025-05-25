@@ -21,7 +21,6 @@ namespace Celesta
                 Array.Clear(buffer, offset, count);
                 return count; 
             }
-
             int read = _source.Read(buffer, offset, count);
             if (read == 0)
                 IsPaused = true;
@@ -50,6 +49,9 @@ namespace Celesta
         }
         public SoundPlayer(ISampleProvider insound, float invol)
         {
+            // Turn into stereo if the source is mono by just duplicating the channel
+            // This is necessary because otherwise none of the providers will work properly
+            // (and the mixer doesnt like it either)
             if (insound.WaveFormat.Channels < 2)
             {
                 // Turn into stereo if the source is mono by just duplicating the channel
@@ -62,6 +64,7 @@ namespace Celesta
             volumeProvider = new VolumeSampleProvider(reverb);
             Volume = (float)invol;
             soundProvider = volumeProvider;
+
             // Mixer requires sounds to be all of the same sample rate
             if (volumeProvider.WaveFormat.SampleRate != 44100)
                 soundProvider = new WdlResamplingSampleProvider(volumeProvider, 44100);

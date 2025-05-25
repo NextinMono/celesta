@@ -16,6 +16,7 @@ using SonicAudioLib.Archives;
 
 using System.Windows.Forms;
 using Celesta.CsbTypes;
+using System.Threading.Tasks;
 
 namespace Celesta.Importer
 {
@@ -233,9 +234,14 @@ namespace Celesta.Importer
                     synthNode.VoiceLimitGroupReference = synthTable.VoiceLimitGroupName;
                 }
             }
-
+                        
             // Extract everything
-            project.audioFiles = extractor.Run();
+            project.AudioExtractor = Task.Factory.StartNew(() => 
+            {
+                project.AudioExtractorTime.Start();
+                project.audioFiles = extractor.Run();
+                project.AudioExtractorTime.Stop();
+            });
             return project;
         }
     }

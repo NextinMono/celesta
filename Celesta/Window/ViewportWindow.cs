@@ -20,9 +20,28 @@ namespace Celesta
             Vector2 wndSize = new Vector2(size, ((ImGui.GetWindowViewport().Size.Y - MenuBarWindow.menuBarHeight - footSizeY) / 2));
             WindowSize = wndSize;
 
+
+            if (renderer.config.workFile != null)
+            {
+                //Show a little warning message when the audio is still extracting after 0.25s
+                if (!renderer.config.workFile.AudioExtractor.IsCompleted && renderer.config.workFile.AudioExtractorTime.ElapsedMilliseconds > 250)
+                {
+                    string msg = "Loading audio into memory, please wait...";
+                    ImConverse.CenterWindow(new Vector2(wndSize.X, ImGui.GetFontSize() * 4.5f));
+                    ImGui.OpenPopup("Loading Audio");
+                    bool open = true;
+                    if (ImGui.BeginPopupModal("Loading Audio", ref open, ImGuiWindowFlags.Tooltip | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoResize))
+                    {
+                        ImConverse.Notice(msg, ImConverseNotice.Info);
+                        ImGui.EndPopup();
+                    }
+                }
+            }
+
             Vector2 footSize = new Vector2(ImGui.GetWindowViewport().Size.X, footSizeY);
             ImGui.SetNextWindowPos(new Vector2(0, renderer.screenSize.Y - footSize.Y));
             ImGui.SetNextWindowSize(footSize);
+
             if (ImGui.Begin("Footer", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
                 //Size of biggest button + some extra space (so it looks nicer)

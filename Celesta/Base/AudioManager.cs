@@ -145,7 +145,9 @@ namespace Celesta
             SynthNode synthToPlay = GetSoundToPlay(ref soundPlayerOpt);
             if (synthToPlay == null)
                 return;
+            Console.WriteLine($"---------------");
             AddSynthSound(synthToPlay, soundPlayerOpt);
+            Console.WriteLine($"---------------");
 
             switch (SettingsWindow.Instance.GetAudioPlayerType())
             {
@@ -211,8 +213,9 @@ namespace Celesta
                 sound.Stop();
                 sound.Dispose();
             }
-            providerMixer = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(44100, 2));
             sounds.Clear();
+            providerMixer = null;
+            providerMixer = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(44100, 2));
             //foreach(var sound in sounds)
             //{
             //    sound.Value.Kill();
@@ -389,6 +392,7 @@ namespace Celesta
                 soundPlayer.Flags = in_Options;
                 providerMixer.AddMixerInput(soundPlayer.soundProvider);
                 sounds.Add(synth, soundPlayer);
+                Console.WriteLine($"[{sounds.Count} - {synth.SynthName}] Wave [{waveStream.WaveFormat}]");
             }
         }
     }

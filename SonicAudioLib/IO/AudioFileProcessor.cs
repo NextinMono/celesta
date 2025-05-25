@@ -76,7 +76,6 @@ namespace SonicAudioLib.IO
                 Console.WriteLine($"Malformed ADX file, replacing with silence. [{name}]");
                 IsEmpty = true;
             }
-            adxStream.Dispose();
         }
     }
     public class AudioFileProcessor

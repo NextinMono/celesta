@@ -5,6 +5,8 @@ using System.Xml.Serialization;
 using Celesta.CsbTypes;
 using SonicAudioLib.IO;
 using System;
+using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace Celesta.Project
 {
@@ -142,6 +144,10 @@ namespace Celesta.Project
                 return easyNodes;
             }
         }
+
+        public Task AudioExtractor { get; internal set; }
+        public Stopwatch AudioExtractorTime = new Stopwatch();
+
         public EasyAisacNode GetAisacNodesByCommonName(string name)
         {
             foreach(var node in easyNodes)
@@ -296,7 +302,7 @@ namespace Celesta.Project
             {
                 audioFiles[i].Dispose();
             }
-            GC.Collect();
+            audioFiles.Clear();
         }
 
         public CsbProject(string in_Path) : base()
