@@ -612,6 +612,8 @@ namespace Celesta
                         {
                             if (CollapsingHeaderIcon($"Aisac Node Settings", NodeIconResource.Aisac, ImGuiTreeNodeFlags.DefaultOpen))
                             {
+                                string aisacname = currentAisac.AisacName;
+                                ImGui.InputText("Name", ref aisacname, 256);
                                 ImGui.SeparatorText("Graphs");
                                 for (int a = 0; a < currentAisac.AisacNodes.Count; a++)
                                 {

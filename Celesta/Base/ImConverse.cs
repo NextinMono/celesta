@@ -386,17 +386,15 @@ namespace Celesta
             ImGui.PopID();
             return returnVal;
         }
-        public static bool VisibilityNodeSimpleSlider(string in_Name, ref float in_Value, float in_Max, Action in_RightClickAction = null, SIconData in_Icon = new(), string in_Id = "")
+        //TODO:
+        //make this less uggo
+        public static bool VisibilityNodeSimpleSlider(string in_Name, ref float in_Value, float in_Max, Action in_RightClickAction = null, SIconData in_Icon = new())
         {
+            bool iconPresent = !in_Icon.IsNull();
             bool returnVal = true;
-            bool idPresent = !string.IsNullOrEmpty(in_Id);
-            string idName = idPresent ? in_Id : in_Name;
+            Vector2 cursorPosSameLine = ImGui.GetCursorScreenPos();
             //Make header fit the content
-            ImGui.PushStyleVar(ImGuiStyleVar.FramePadding, new System.Numerics.Vector2(0, 3));
-            returnVal = ImGui.Button($"##{idName}header");
-            ImGui.SameLine(0, 1 * ImGui.GetStyle().ItemSpacing.X);
-            ImGui.SetNextItemAllowOverlap();
-            ImGui.PopStyleVar();
+            returnVal = ImGui.Selectable($"##{in_Name}header", ImGuiSelectableFlags.AllowOverlap);
             //Rightclick action
             if (in_RightClickAction != null)
             {
@@ -406,35 +404,17 @@ namespace Celesta
                     ImGui.EndPopup();
                 }
             }
-            //Visibility checkbox
-            //ImGui.SameLine(0, 1 * ImGui.GetStyle().ItemSpacing.X);
-            //ImGui.Checkbox($"##{idName}togg", ref in_Visibile);
-            ImGui.SameLine(0, 1 * ImGui.GetStyle().ItemSpacing.X);
-            //Show text with icon (cant have them merged because of stupid imgui c# bindings)
+            ImGui.SameLine();
 
-            Vector2 p = ImGui.GetCursorScreenPos();
-            ImGui.SetNextItemAllowOverlap();
-
-            ////Setup button so that the borders and background arent seen unless its hovered
-            //ImGui.PushStyleColor(ImGuiCol.FrameBg, ImGui.ColorConvertFloat4ToU32(new Vector4(0, 0, 0, 0)));
-            //ImGui.PushStyleColor(ImGuiCol.Border, ImGui.ColorConvertFloat4ToU32(new Vector4(0, 0, 0, 0)));
-            //ImGui.PushStyleColor(ImGuiCol.Button, ImGui.ColorConvertFloat4ToU32(new Vector4(0, 0, 0, 0)));
-            bool iconPresent = !in_Icon.IsNull();
-            ////ImGui.Button($"##invButton{idName}", new Vector2(-1, 25));
-            //ImGui.PopStyleColor(3);
-
-            //Begin drawing text & icon if it exists
-            ImGui.SetNextItemAllowOverlap();
-            ImGui.PushID($"##text{idName}");
+            ImGui.PushID($"##text{in_Name}");
             ImGui.BeginGroup();
-
             if (iconPresent)
             {
                 //Draw icon
                 //ImGui.PushFont(ImGuiController.FontAwesomeFont);
                 ImGui.SameLine(0, 0);
                 ImGui.SetNextItemAllowOverlap();
-                ImGui.SetCursorScreenPos(p);
+                ImGui.SetCursorScreenPos(cursorPosSameLine);
                 ImGui.TextColored(in_Icon.Color, in_Icon.Icon);
                 //ImGui.PopFont();
                 ImGui.SameLine(0, 0);
@@ -442,16 +422,16 @@ namespace Celesta
             else
             {
                 //Set size for the text as if there was an icon
-                ImGui.SetCursorScreenPos(p + new Vector2(0, 2));
+                ImGui.SetCursorScreenPos(cursorPosSameLine + new Vector2(0, 2));
             }
-            ImGui.SetNextItemAllowOverlap();
             ImGui.Text(iconPresent ? $" {in_Name}" : in_Name);
-            ImGui.SameLine(0, 0);
-            ImGui.SetNextItemAllowOverlap();
+            //ImGui.Dummy(ImGui.CalcTextSize("".PadRight(10, 'A')));
+            ImGui.SameLine();
             ImGui.SliderFloat("##sliderrr", ref in_Value, 0, 1);
 
             ImGui.EndGroup();
             ImGui.PopID();
+
             return returnVal;
         }
         public static bool VisibilityNode(string in_Name, ref bool in_IsSelected, Action in_RightClickAction = null, bool in_ShowArrow = true, SIconData in_Icon = new(), string in_Id = "")
