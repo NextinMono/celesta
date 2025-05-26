@@ -51,7 +51,7 @@ namespace Celesta
                         for (int i = 0; i < csbProject.SoundElementNodes.Count; i++)
                         {
                             SoundElement soundElement = csbProject.SoundElementNodes[i];
-                            if (ImConverse.VisibilityNodeSimple(soundElement.Name.Split('/')[^1], RightClickCue, in_Icon: NodeIconResource.SoundElement))
+                            if (ImConverse.VisibilityNodeSimple(soundElement.Path.Split('/')[^1], RightClickCue, in_Icon: NodeIconResource.SoundElement))
                             {
                                 EditorWindow.Instance.SelectSE(i);
                             }

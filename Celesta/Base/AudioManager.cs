@@ -78,7 +78,7 @@ namespace Celesta
                     if (sound.Value.Flags.HasFlag(SoundPlayer.EOptions.eOptions_IsSynthPlay))
                         continue;
 
-                    var e = csbProject.AisacNodes.FirstOrDefault(x => x.Name == sound.Key.AisacReference);
+                    var e = csbProject.AisacNodes.FirstOrDefault(x => x.Path == sound.Key.AisacReference);
                     if(e != null)
                     {
                         foreach (var graph in e.Graphs)
@@ -281,7 +281,7 @@ namespace Celesta
         {
             foreach (var se in csbProject.SoundElementNodes)
             {
-                if (se.Name == in_Name)
+                if (se.Path == in_Name)
                     return se;
             }
             return null;

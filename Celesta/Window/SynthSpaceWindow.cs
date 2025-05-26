@@ -52,7 +52,7 @@ namespace Celesta
                 {
                     var parent = CsbCommon.GetSynthByName(synth.Parent);
                     if (parent != null)
-                        parent.Children.Remove(synth.Name);
+                        parent.Children.Remove(synth.Path);
                 }
 
             }

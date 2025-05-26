@@ -62,7 +62,7 @@ namespace Celesta.Builder
             {
                 SerializationSynthTable synthTable = new SerializationSynthTable
                 {
-                    SynthName = synthNode.Name,
+                    SynthName = synthNode.Path,
                     SynthType = (byte)synthNode.Type,
                     ComplexType = (byte)synthNode.PlaybackType,
                     Volume = synthNode.Volume,
@@ -166,8 +166,8 @@ namespace Celesta.Builder
 
                 if (!string.IsNullOrEmpty(synthNode.AisacReference))
                 {
-                    BuilderAisacNode aisacNode = project.AisacNodes.First(aisac => aisac.Name == synthNode.AisacReference);
-                    synthTable.AisacSetName = aisacNode.AisacName + "::" + aisacNode.Name + (char)0x0A;
+                    AisacNode aisacNode = project.AisacNodes.First(aisac => aisac.Path == synthNode.AisacReference);
+                    synthTable.AisacSetName = aisacNode.AisacName + "::" + aisacNode.Path + (char)0x0A;
                 }
 
                 synthTables.Add(synthTable);
@@ -217,11 +217,11 @@ namespace Celesta.Builder
                 if (soundElementNode.Streaming)
                 {
                     CriCpkEntry entry = new CriCpkEntry();
-                    entry.Name = Path.GetFileName(soundElementNode.Name);
-                    entry.DirectoryName = Path.GetDirectoryName(soundElementNode.Name);
+                    entry.Name = Path.GetFileName(soundElementNode.Path);
+                    entry.DirectoryName = Path.GetDirectoryName(soundElementNode.Path);
                     entry.Id = (uint)cpkArchive.Count;
                     entry.UpdateDateTime = DateTime.Now;
-                    entry.FileData = FindAudioFromSoundelement(project, soundElementNode.Name).EncodeAudioDataToAdxStream();
+                    entry.FileData = FindAudioFromSoundelement(project, soundElementNode.Path).EncodeAudioDataToAdxStream();
                     entry.FilePath = new FileInfo(Path.GetTempFileName());
                     cpkArchive.Add(entry);
 
@@ -235,7 +235,7 @@ namespace Celesta.Builder
 
                 soundElementTables.Add(new SerializationSoundElementTable
                 {
-                    Name = soundElementNode.Name,
+                    Name = soundElementNode.Path,
                     Data = data,
                     FormatType = (byte)aaxArchive.Mode,
                     SoundFrequency = soundElementNode.SampleRate,
@@ -255,7 +255,7 @@ namespace Celesta.Builder
 
             // Serialize the aisacs.
             List<SerializationAisacTable> aisacTables = new List<SerializationAisacTable>();
-            foreach (BuilderAisacNode aisacNode in project.AisacNodes)
+            foreach (AisacNode aisacNode in project.AisacNodes)
             {
                 List<SerializationAisacGraphTable> graphTables = new List<SerializationAisacGraphTable>();
                 foreach (BuilderAisacGraphNode graphNode in aisacNode.Graphs)
@@ -285,7 +285,7 @@ namespace Celesta.Builder
                 {
                     Graph = CriTableSerializer.Serialize(graphTables, CriTableWriterSettings.AdxSettings),
                     Name = aisacNode.AisacName,
-                    PathName = aisacNode.Name,
+                    PathName = aisacNode.Path,
                     Type = aisacNode.Type,
                     RandomRange = aisacNode.RandomRange,
                 });
@@ -304,7 +304,7 @@ namespace Celesta.Builder
             {
                 voiceLimitGroupTables.Add(new SerializationVoiceLimitGroupTable
                 {
-                    VoiceLimitGroupName = voiceLimitGroupNode.Name,
+                    VoiceLimitGroupName = voiceLimitGroupNode.Path,
                     VoiceLimitGroupNum = voiceLimitGroupNode.MaxAmountOfInstances,
                 });
             }

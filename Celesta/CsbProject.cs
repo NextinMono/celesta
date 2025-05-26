@@ -12,17 +12,17 @@ namespace Celesta.Project
 {
     public class EasyAisacNode : ICloneable
     {
-        public string aisacName;
-        public List<BuilderAisacNode> builderAisacNodes = new List<BuilderAisacNode>();
-        public float progress;
+        public string AisacName;
+        public List<AisacNode> AisacNodes = new List<AisacNode>();
+        public float Progress;
 
         public void SetProgress(float in_Prog)
         {
-            foreach (var node in builderAisacNodes)
+            foreach (var node in AisacNodes)
             {
                 node.Progress = in_Prog;
             }
-            progress = in_Prog;
+            Progress = in_Prog;
         }
 
         public object Clone()
@@ -40,7 +40,7 @@ namespace Celesta.Project
         public List<CueNode> CueNodes = new List<CueNode>();
         private List<SynthNode> synthNodes = new List<SynthNode>();
         private List<SoundElement> soundElementNodes = new List<SoundElement>();
-        private List<BuilderAisacNode> aisacNodes = new List<BuilderAisacNode>();
+        private List<AisacNode> aisacNodes = new List<AisacNode>();
         private List<BuilderVoiceLimitGroupNode> voiceLimitGroupNodes = new List<BuilderVoiceLimitGroupNode>();
 
         public string Name
@@ -119,8 +119,8 @@ namespace Celesta.Project
             }
         }
 
-        [XmlArray("AisacNodes"), XmlArrayItem(typeof(BuilderAisacNode))]
-        public List<BuilderAisacNode> AisacNodes
+        [XmlArray("AisacNodes"), XmlArrayItem(typeof(AisacNode))]
+        public List<AisacNode> AisacNodes
         {
             get
             {
@@ -152,7 +152,7 @@ namespace Celesta.Project
         {
             foreach(var node in easyNodes)
             {
-                if (node.aisacName == name)
+                if (node.AisacName == name)
                     return node;
             }
             return null;
@@ -250,29 +250,29 @@ namespace Celesta.Project
         }
         public void Rename(SoundElement currentSynth, string name)
         {
-            var oldPath = currentSynth.Name;
+            var oldPath = currentSynth.Path;
             currentSynth.SEName = name;
 
             foreach (var cue in SynthNodes)
             {
                 if (cue.SoundElementReference == oldPath)
-                    cue.SoundElementReference = currentSynth.Name;
+                    cue.SoundElementReference = currentSynth.Path;
             }
         }
         public void Rename(SynthNode currentSynth, string name)
         {
-            var oldPath = currentSynth.Name;
+            var oldPath = currentSynth.Path;
             currentSynth.SynthName = name;
 
             foreach(var cue in CueNodes)
             {
                 if (cue.SynthReference == oldPath)
-                    cue.SynthReference = currentSynth.Name;
+                    cue.SynthReference = currentSynth.Path;
             }
             foreach(var synth in SynthNodes)
             {
-                if (synth.Name.Contains(oldPath))
-                    synth.Name.Replace(oldPath, currentSynth.Name);
+                if (synth.Path.Contains(oldPath))
+                    synth.Path.Replace(oldPath, currentSynth.Path);
             }
         }
 

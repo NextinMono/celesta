@@ -124,7 +124,7 @@ namespace Celesta
                     id = cues.Id;
             }
             node.Id = id + 1;
-            node.SynthReference = CelestaProject.Instance.config.workFile.SynthNodes[0].Name;
+            node.SynthReference = CelestaProject.Instance.config.workFile.SynthNodes[0].Path;
             node.Name += id;
             config.workFile.CueNodes.Add(node);
             return node;
@@ -141,18 +141,18 @@ namespace Celesta
         internal SynthNode AddSynth()
         {
             var synth = new SynthNode();
-            synth.Name = $"Synth/NewSynth{config.workFile.SynthNodes.Count - 1}";
+            synth.Path = $"Synth/NewSynth{config.workFile.SynthNodes.Count - 1}";
             config.workFile.SynthNodes.Add(synth);
             return synth;
         }
 
         internal void AddSynthChild(SynthNode synth, SynthNode synthChild)
         {
-            var split = synthChild.Name.Split('/').ToList();
+            var split = synthChild.Path.Split('/').ToList();
             split.Insert(1, synth.SynthName);
-            synthChild.Name = string.Join('/', split);
-            synthChild.Parent = synth.Name;
-            synth.Children.Add(synthChild.Name);
+            synthChild.Path = string.Join('/', split);
+            synthChild.Parent = synth.Path;
+            synth.Children.Add(synthChild.Path);
         }
     }
 }

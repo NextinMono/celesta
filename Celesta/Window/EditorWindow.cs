@@ -7,11 +7,15 @@ using HekonrayBase.Base;
 using Hexa.NET.ImGui;
 using System;
 using System.Numerics;
+using Hexa.NET.ImPlot;
+using Hexa.NET.Utilities.Text;
+using System.Collections.Generic;
 namespace Celesta
 {
     public class EditorWindow : Singleton<EditorWindow>, IWindow
     {
         private int cueNodeSelection, seSelection;
+        private EasyAisacNode aisacSelection;
         private SynthNode synthSelection;
         CsbProject csbProject => CelestaProject.Instance.config.workFile;
         public void SelectSE(int in_Index)
@@ -19,18 +23,28 @@ namespace Celesta
             seSelection = in_Index;
             cueNodeSelection = -1;
             synthSelection = null;
+            aisacSelection = null;
         }
         public void SelectCue(int in_Index)
         {
             cueNodeSelection = in_Index;
             synthSelection = null;
             seSelection = -1;
+            aisacSelection = null;
         }
         public void SelectSynth(SynthNode in_Synth)
         {
             cueNodeSelection = -1;
             synthSelection = in_Synth;
             seSelection = -1;
+            aisacSelection = null;
+        }
+        public void SelectAisac(EasyAisacNode in_Index)
+        {
+            cueNodeSelection = -1;
+            synthSelection = null;
+            seSelection = -1;
+            aisacSelection = in_Index;
         }
         public CueNode GetCurrentCueNode()
         {
@@ -42,6 +56,10 @@ namespace Celesta
         {
             if(seSelection == -1) return null;
             return csbProject.SoundElementNodes[Math.Clamp(seSelection, 0, csbProject.SoundElementNodes.Count - 1)];
+        }
+        public EasyAisacNode GetCurrentAisac()
+        {
+            return aisacSelection;
         }
         public SynthNode GetCurrentSynth()
         {
@@ -176,6 +194,90 @@ namespace Celesta
             ImGui.EndGroup();
             return value_changed;
         }
+
+        private void DrawGraph(string in_Name, BuilderAisacGraphNode in_Graph, int synth)
+        {
+            unsafe
+            {
+                int type = in_Graph.Type;
+                ImGui.PushID($"{in_Name}_type");
+                ImGui.InputInt("Type", ref type);
+                ImGui.PopID();
+                in_Graph.Type = (byte)type;
+
+                //ImPlot.PushStyleVar(ImPlotStyleVar., ImPlotAxisFlags.LockMin);
+                if (ImPlot.BeginPlot(in_Name, new System.Numerics.Vector2(-1, 200)))
+                {
+                    ImPlotAxis* xAxis = ImPlot.GetCurrentPlot().XAxis(0);
+                    xAxis->Flags |= ImPlotAxisFlags.LockMin | ImPlotAxisFlags.LockMax;
+                    xAxis->SetMin(0);
+                    xAxis->SetMax(110, true);
+
+                    //WHYYYYY
+                    ImPlotAxis* yAxis = ImPlot.GetCurrentPlot().YAxis(0);
+                    yAxis->Flags |= ImPlotAxisFlags.LockMin | ImPlotAxisFlags.LockMax;
+                    yAxis->SetMin(0);
+                    yAxis->SetMax(110, true);
+
+                    int divisionFactor = 100;
+                    const int bufferSize = 256;
+                    byte* buffer = stackalloc byte[bufferSize];
+                    StrBuilder sb = new(buffer, bufferSize);
+                    sb.Append($"{in_Name}anim");
+                    sb.End();
+
+                    //ms_Points.Clear();
+                    //Line for the anim time
+                    //if (ImPlot.DragLineX(0, &time, new Vector4(1, 1, 1, 1), 1))
+                    //{
+                    //    in_Renderer.Config.Time = (float)(time / selectedScene.Value.Value.FrameRate);
+                    //}
+                    List<float> pointsX = new List<float>();
+                    List<float> pointsY = new List<float>();
+                    //Animation keyframe points
+                    for (int i = 0; i < in_Graph.Points.Count; i++)
+                    {
+                        ImPlotPoint point = new ImPlotPoint(in_Graph.Points[i].X / divisionFactor, in_Graph.Points[i].Y / divisionFactor);
+
+                        bool isClicked = false;
+                        if (ImPlot.DragPoint(i, &point.X, &point.Y, new Vector4(0, 0.6f, 1, 1), 8, ImPlotDragToolFlags.None, &isClicked))
+                        {
+                            if (point.X <= 0)
+                                point.X = 0;
+                            if (point.Y <= 0)
+                            {
+                                point.Y = 0;
+                                if (AudioManager.IsPlaying)
+                                    AudioManager.sounds[csbProject.SynthNodes[synth]].Volume = 0;
+                            }
+                            else
+                            {
+                                if (point.Y > 50000 / divisionFactor)
+                                    point.Y = 50000 / divisionFactor;
+                                if (AudioManager.IsPlaying)
+                                    AudioManager.sounds[csbProject.SynthNodes[synth]].SetVolumeCsb((float)(point.Y));
+                            }
+                            in_Graph.Points[i].X = (ushort)(point.X * divisionFactor);
+                            in_Graph.Points[i].Y = (ushort)(point.Y * divisionFactor);
+                        }
+                        pointsX.Add((float)point.X);
+                        pointsY.Add((float)point.Y);
+                        //if (isClicked)
+                        //    in_Renderer.SelectionData.KeyframeSelected = in_Renderer.SelectionData.TrackAnimation.Frames[i];
+                    }
+
+                    fixed (float* test = pointsX.ToArray())
+                    {
+                        fixed (float* test2 = pointsY.ToArray())
+                        {
+                            ImPlot.SetNextLineStyle(new Vector4(0, 0.6f, 1, 1), 2.0f);
+                            ImPlot.PlotLine($"##h1", test, test2, pointsX.Count);
+                        }
+                    }
+                    ImPlot.EndPlot();
+                }
+            }
+        }
         public void Render(IProgramProject in_Renderer)
         {
             var posEditor = new Vector2(ViewportWindow.WindowSize.X, Celesta.MenuBarWindow.menuBarHeight);
@@ -193,6 +295,7 @@ namespace Celesta
                         CueNode currentCue = GetCurrentCueNode();
                         SoundElement currentSE = GetCurrentSE();
                         SynthNode currentSynth = GetCurrentSynth();
+                        EasyAisacNode currentAisac = GetCurrentAisac();
 
                         if (currentCue != null)
                         {
@@ -215,7 +318,7 @@ namespace Celesta
                                             ImGui.Indent();
                                         if (ImGui.Selectable(icon + csbProject.SynthNodes[n].SynthName))
                                         {
-                                            currentCue.SynthReference = csbProject.SynthNodes[n].Name;
+                                            currentCue.SynthReference = csbProject.SynthNodes[n].Path;
                                         }
                                         if (isChild)
                                             ImGui.Unindent();
@@ -229,6 +332,7 @@ namespace Celesta
                         }
                         if (currentSynth != null)
                         {
+                            currentAisac = currentSynth.GetEasyAisac();
                             if (CollapsingHeaderIcon($"Synth Settings",NodeIconResource.Synth, ImGuiTreeNodeFlags.DefaultOpen))
                             {
                                 string name = currentSynth.SynthName;
@@ -277,7 +381,7 @@ namespace Celesta
                                         
                                         if (ImGui.Selectable(icon + csbProject.SoundElementNodes[n].SEName))
                                         {
-                                            currentSynth.SoundElementReference = csbProject.SoundElementNodes[n].Name;
+                                            currentSynth.SoundElementReference = csbProject.SoundElementNodes[n].Path;
                                         }
                                     }
                                     ImGui.EndCombo();
@@ -503,6 +607,57 @@ namespace Celesta
                                     currentSynth.Wcnct7 = fUnk11;
                                 }
                             }
+                        }
+                        if(currentAisac != null)
+                        {
+                            if (CollapsingHeaderIcon($"Aisac Node Settings", NodeIconResource.Aisac, ImGuiTreeNodeFlags.DefaultOpen))
+                            {
+                                ImGui.SeparatorText("Graphs");
+                                for (int a = 0; a < currentAisac.AisacNodes.Count; a++)
+                                {
+                                    if (ImGui.TreeNodeEx(currentAisac.AisacNodes[a].Path))
+                                    {
+                                        string name = currentAisac.AisacNodes[a].AisacName;
+                                        ImGui.InputText("Name", ref name, 512);
+                                        for (int b = 0; b < currentAisac.AisacNodes[a].Graphs.Count; b++)
+                                        {
+                                            int snyth = 0;
+                                            for (int h = 0; h < renderer.config.workFile.SynthNodes.Count; h++)
+                                            {
+                                                SynthNode synth = renderer.config.workFile.SynthNodes[h];
+                                                if (synth.AisacReference == currentAisac.AisacNodes[a].Path)
+                                                {
+                                                    snyth = h;
+                                                    break;
+                                                }
+                                            }
+                                            DrawGraph($"##curves_{b}", currentAisac.AisacNodes[a].Graphs[b], snyth);
+                                        }
+                                        ImGui.TreePop();
+                                    }
+                                }
+                            }
+                            //for (int i = 0; i < renderer.config.workFile.AisacNodes.Count; i++)
+                            //{
+                            //    AisacNode item = renderer.config.workFile.AisacNodes[i];
+                            //    if (ImGui.CollapsingHeader(item.Path))
+                            //    {
+                            //        for (int a = 0; a < item.Graphs.Count; a++)
+                            //        {
+                            //            int snyth = 0;
+                            //            for (int h = 0; h < renderer.config.workFile.SynthNodes.Count; h++)
+                            //            {
+                            //                SynthNode synth = renderer.config.workFile.SynthNodes[h];
+                            //                if (synth.AisacReference == item.Path)
+                            //                {
+                            //                    snyth = h;
+                            //                    break;
+                            //                }
+                            //            }
+                            //            DrawGraph($"##curves{i}_{a}", item.Graphs[a], snyth);
+                            //        }
+                            //    }
+                            //}
                         }
                         if(currentSE != null)
                         {

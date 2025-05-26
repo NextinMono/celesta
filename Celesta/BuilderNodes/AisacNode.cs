@@ -9,7 +9,7 @@ using SonicAudioLib.CriMw.Serialization;
 
 namespace Celesta.BuilderNodes
 {
-    public class BuilderAisacNode : BuilderBaseNode
+    public class AisacNode : BuilderBaseNode
     {
         public float Progress;
 
@@ -27,9 +27,9 @@ namespace Celesta.BuilderNodes
         [Category("Graph"), DisplayName("Random Range")]
         public byte RandomRange { get; set; }
 
-        public BuilderAisacNode(SerializationAisacTable aisacTable)
+        public AisacNode(SerializationAisacTable aisacTable)
         {
-            Name = aisacTable.PathName;
+            Path = aisacTable.PathName;
             AisacName = aisacTable.Name;
             Type = aisacTable.Type;
             RandomRange = aisacTable.RandomRange;
@@ -39,7 +39,7 @@ namespace Celesta.BuilderNodes
             foreach (SerializationAisacGraphTable graphTable in graphTables)
             {
                 BuilderAisacGraphNode graphNode = new BuilderAisacGraphNode();
-                graphNode.Name = $"Graph{Graphs.Count}";
+                graphNode.Path = $"Graph{Graphs.Count}";
                 graphNode.Type = graphTable.Type;
                 graphNode.MaximumX = graphTable.InMax;
                 graphNode.MinimumX = graphTable.InMin;
@@ -51,7 +51,7 @@ namespace Celesta.BuilderNodes
                 foreach (SerializationAisacPointTable pointTable in pointTables)
                 {
                     BuilderAisacPointNode pointNode = new BuilderAisacPointNode();
-                    pointNode.Name = $"Point{graphNode.Points.Count}";
+                    pointNode.Path = $"Point{graphNode.Points.Count}";
                     pointNode.X = pointTable.In;
                     pointNode.Y = pointTable.Out;
                     graphNode.Points.Add(pointNode);

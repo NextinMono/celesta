@@ -13,13 +13,13 @@ namespace Celesta.BuilderNodes
         {
             get
             {
-                return Name.Split('/')[^1];
+                return Path.Split('/')[^1];
             }
             set
             {
-                var split = Name.Split('/');
+                var split = Path.Split('/');
                 split[^1] = value;
-                Name = string.Join('/', split);
+                Path = string.Join('/', split);
 
             }
         }

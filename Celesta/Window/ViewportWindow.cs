@@ -84,7 +84,7 @@ namespace Celesta
                 foreach (var sound in AudioManager.sounds)
                 {
                     ImGui.SameLine();
-                    ImGui.Text($"[{sound.Key.Name}: {(int)(sound.Value.Volume * 100)}%%]");
+                    ImGui.Text($"[{sound.Key.Path}: {(int)(sound.Value.Volume * 100)}%%]");
                 }
             }
             ImGui.End();

@@ -1,6 +1,7 @@
 ﻿using Celesta;
 using Celesta.BuilderNodes;
 using Celesta.CsbTypes;
+using Celesta.Project;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,23 +16,43 @@ namespace Celesta
         {
             foreach (var item in CelestaProject.Instance.config.workFile.SynthNodes)
             {
-                if (item.Name == in_Name)
+                if (item.Path == in_Name)
                     return item;
             }
             return null;
         }
-        public static BuilderAisacNode GetAisacByName(string in_Name)
+        public static AisacNode GetAisacByName(string in_Name)
         {
             foreach (var item in CelestaProject.Instance.config.workFile.AisacNodes)
             {
-                if (item.Name == in_Name)
+                if (item.Path == in_Name)
                     return item;
+            }
+            return null;
+        }
+        public static EasyAisacNode GetEasyAisacByName(string in_Name)
+        {
+            foreach (var item in CelestaProject.Instance.config.workFile.UniqueAisacNodes)
+            {
+                foreach(var item2 in item.AisacNodes)
+                {
+                    if (item2.Path == in_Name)
+                        return item;
+                }
             }
             return null;
         }
         public static SynthNode GetSynth(this CueNode node)
         {
             return GetSynthByName(node.SynthReference);
+        }
+        public static AisacNode GetAisac(this SynthNode node)
+        {
+            return GetAisacByName(node.AisacReference);
+        }
+        public static EasyAisacNode GetEasyAisac(this SynthNode node)
+        {
+            return GetEasyAisacByName(node.AisacReference);
         }
         public static int FindKeyframe(this BuilderAisacGraphNode in_List, float in_Frame)
         {

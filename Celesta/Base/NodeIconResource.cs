@@ -7,7 +7,7 @@
         private static SIconData soundResource = new SIconData(FontAwesome6.File, ColorResource.File);
         private static SIconData synth = new SIconData(FontAwesome6.Music, ColorResource.Group);
         private static SIconData synthGroup = new SIconData(FontAwesome6.CompactDisc, ColorResource.Group);
-        private static SIconData aisac = new SIconData(FontAwesome6.Circle, ColorResource.File);
+        private static SIconData aisac = new SIconData(FontAwesome6.Circle, ColorResource.Aisac);
         private static SIconData cue = new SIconData(FontAwesome6.VolumeHigh, ColorResource.Celeste);
 
         public static SIconData SoundElement => soundResource;

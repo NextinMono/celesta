@@ -12,7 +12,7 @@ namespace Celesta.BuilderNodes
     {
         [Category("General"), ReadOnly(true)]
         [Description("Name of this node.")]
-        public string Name { get; set; }
+        public string Path { get; set; }
 
         public object Clone()
         {

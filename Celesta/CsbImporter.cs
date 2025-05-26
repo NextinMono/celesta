@@ -26,7 +26,7 @@ namespace Celesta.Importer
         {
             foreach (var item in in_Proj.SynthNodes)
             {
-                if (item.Name == in_Name)
+                if (item.Path == in_Name)
                     return item;
             }
             return null;
@@ -98,7 +98,7 @@ namespace Celesta.Importer
             foreach (SerializationSoundElementTable soundElementTable in soundElementTables)
             {
                 SoundElement soundElementNode = new SoundElement();
-                soundElementNode.Name = soundElementTable.Name;
+                soundElementNode.Path = soundElementTable.Name;
                 soundElementNode.ChannelCount = soundElementTable.NumberChannels;
                 soundElementNode.SampleRate = soundElementTable.SoundFrequency;
                 soundElementNode.Streaming = soundElementTable.Streaming;
@@ -161,7 +161,7 @@ namespace Celesta.Importer
             {
                 project.VoiceLimitGroupNodes.Add(new BuilderVoiceLimitGroupNode
                 {
-                    Name = voiceLimitGroupTable.VoiceLimitGroupName,
+                    Path = voiceLimitGroupTable.VoiceLimitGroupName,
                     MaxAmountOfInstances = voiceLimitGroupTable.VoiceLimitGroupNum,
                 });
             }
@@ -169,21 +169,21 @@ namespace Celesta.Importer
             // Deserialize Aisac tables
             foreach (SerializationAisacTable aisacTable in aisacTables)
             {                
-                project.AisacNodes.Add(new BuilderAisacNode(aisacTable));
+                project.AisacNodes.Add(new AisacNode(aisacTable));
             }
 
             foreach(var aisacNodes in project.AisacNodes)
             {
-                var e = project.UniqueAisacNodes.FirstOrDefault(x => x.aisacName == aisacNodes.AisacName);
+                var e = project.UniqueAisacNodes.FirstOrDefault(x => x.AisacName == aisacNodes.AisacName);
                 if(e != null)
                 {
-                    e.builderAisacNodes.Add(aisacNodes);
+                    e.AisacNodes.Add(aisacNodes);
                 }
                 else
                 {
                     project.UniqueAisacNodes.Add(new EasyAisacNode());
-                    project.UniqueAisacNodes[^1].aisacName = aisacNodes.AisacName;
-                    project.UniqueAisacNodes[^1].builderAisacNodes.Add(aisacNodes);
+                    project.UniqueAisacNodes[^1].AisacName = aisacNodes.AisacName;
+                    project.UniqueAisacNodes[^1].AisacNodes.Add(aisacNodes);
                 }
             }
 
@@ -217,7 +217,7 @@ namespace Celesta.Importer
                     foreach(var child in synthNode.Children)
                     {
                         var childSynth = GetSynthByName(project, child);
-                        childSynth.Parent = synthNode.Name;
+                        childSynth.Parent = synthNode.Path;
                     }
 
                 }
