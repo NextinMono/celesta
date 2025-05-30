@@ -488,12 +488,12 @@ namespace Celesta
                                 }
                                 if (ImGui.TreeNodeEx("Envelope Generator"))
                                 {
-                                    var attack = (int)currentSynth.EgAttack;
-                                    var decay = (int)currentSynth.EgDecay;
-                                    var delay = (int)currentSynth.EgDelay;
-                                    var hold = (int)currentSynth.EgHold;
-                                    var release = (int)currentSynth.EgRelease;
-                                    var sustain = (int)currentSynth.EgSustain;
+                                    var attack = (int)currentSynth.EnvelopeGenerator.Delay;
+                                    var decay = (int)currentSynth.EnvelopeGenerator.Delay;
+                                    var delay = (int)currentSynth.EnvelopeGenerator.Delay;
+                                    var hold = (int)currentSynth.EnvelopeGenerator.Hold;
+                                    var release = (int)currentSynth.EnvelopeGenerator.Release;
+                                    var sustain = (int)currentSynth.EnvelopeGenerator.Sustain;
                                     ImConverse.Notice("This filter is not applied in the tool.", ImConverseNotice.Info);
                                     ImGui.InputInt("Attack", ref attack);
                                     ImGui.InputInt("Decay", ref decay);
@@ -502,12 +502,12 @@ namespace Celesta
                                     ImGui.InputInt("Release", ref release);
                                     ImGui.InputInt("Sustain", ref sustain);
 
-                                    currentSynth.EgAttack = (ushort)attack;
-                                    currentSynth.EgDecay = (ushort)decay;
-                                    currentSynth.EgDelay = (ushort)delay;
-                                    currentSynth.EgHold = (ushort)hold;
-                                    currentSynth.EgRelease = (ushort)release;
-                                    currentSynth.EgSustain = (ushort)sustain;
+                                    currentSynth.EnvelopeGenerator.Attack = (ushort)attack;
+                                    currentSynth.EnvelopeGenerator.Decay = (ushort)decay;
+                                    currentSynth.EnvelopeGenerator.Delay = (ushort)delay;
+                                    currentSynth.EnvelopeGenerator.Hold = (ushort)hold;
+                                    currentSynth.EnvelopeGenerator.Release = (ushort)release;
+                                    currentSynth.EnvelopeGenerator.Sustain = (ushort)sustain;
                                     ImGui.TreePop();
                                 }
                                 if (ImGui.TreeNodeEx("Filter 0"))

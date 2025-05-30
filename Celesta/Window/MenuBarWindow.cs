@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Diagnostics;
 using HekonrayBase.Base;
 using HekonrayBase;
+using Celesta.Importer;
 
 namespace Celesta
 {
@@ -48,7 +49,7 @@ namespace Celesta
         }
         void SaveFileAction(CelestaProject in_Renderer)
         {
-            Celesta.Builder.CsbBuilder.Build(CelestaProject.Instance.config.workFile, CelestaProject.Instance.config.workFilePath);
+            CsbFileManager.Export(CelestaProject.Instance.config.workFile, CelestaProject.Instance.config.workFilePath);
         }
         public void Render(IProgramProject in_Renderer)
         {

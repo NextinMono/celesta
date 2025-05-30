@@ -108,7 +108,7 @@ namespace Celesta
             AudioManager.StopSound();
             config.workFile?.Dispose();
             config.workFile = null;
-            config.workFile = CsbImporter.Import(path);
+            config.workFile = CsbFileManager.Import(path);
             config.workFilePath = path;
             AfterLoadFile();
         }
